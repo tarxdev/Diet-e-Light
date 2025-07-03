@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados da Pesquisa: Diet & Light</title>
+    <title>Diet & Light</title>
+    <link rel="icon" type="image/png" href="android-chrome-512x512.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -164,7 +165,7 @@
         </main>
         
         <footer class="text-center mt-12 text-gray-500">
-            <p>&copy; 2025 Painel Interativo de Dados</p>
+            <p>👥 Group: Tarciso Ferreira | Maria Dayane | Alana Silvestre</p>
         </footer>
     </div>
 
@@ -282,7 +283,7 @@ Formate a resposta com títulos a negrito para cada secção (ex: **Perfil do Re
         });
 
         // --- FUNÇÃO PARA CRIAR GRÁFICOS ---
-        function createDoughnutChart(canvasId, chartData, palette) {
+                function createDoughnutChart(canvasId, chartData, palette) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
@@ -293,6 +294,11 @@ Formate a resposta com títulos a negrito para cada secção (ex: **Perfil do Re
                 options: {
                     responsive: true, maintainAspectRatio: false, cutout: '60%',
                     plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff'
+                            }
+                        },
                         tooltip: {
                             callbacks: { label: (c) => `${c.label || ''}: ${c.parsed.toFixed(1)}%` },
                             backgroundColor: '#111827', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8, displayColors: false
@@ -302,6 +308,8 @@ Formate a resposta com títulos a negrito para cada secção (ex: **Perfil do Re
                 }
             });
         }
+                
+        
 
         // --- INICIALIZAÇÃO DOS GRÁFICOS E ANIMAÇÃO DOS CARDS ---
         document.addEventListener('DOMContentLoaded', () => {
