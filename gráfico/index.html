@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Pesquisa: Diet & Light</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF e html2canvas para exportação em PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
+            transform: rotate(25deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .btn-shine:hover::before {
+            opacity: 1;
+            animation: shine-move 0.8s linear;
+        }
+        @keyframes shine-move {
+            0% { left: -80%; }
+            100% { left: 120%; }
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: #e5e7eb;
+        }
+        .chart-card {
+            background-color: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 16px 2px #60a5fa;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .spinner {
+            border-top-color: #60a5fa;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-6 md:p-8">
+
+    <div class="container mx-auto">
+        <!-- Cabeçalho -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">Análise de Percepção: Produtos Diet & Light</h1>
+            <p class="mt-4 text-lg text-gray-400 max-w-3xl mx-auto">Uma visualização interativa sobre os hábitos e conhecimentos dos consumidores.</p>
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                <button id="geminiAnalyzeBtn" class="btn-shine bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                    Clique aqui para Gerar Resumo Analítico
+                </button>
+                <!-- Botão de download PDF -->
+                <a href="Diet e Light.pdf" download class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                    Baixar relatório em PDF
+                </a>
+                </button>
+            </div>
+        </header>
+
+        <!-- Layout de coluna única (empilhado) -->
+        <main class="max-w-4xl mx-auto flex flex-col gap-8">
+            <!-- Gráfico 1: Idade -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">1. Qual a sua idade?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 2: Escolaridade -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">2. Escolaridade</h3>
+                <div class="chart-wrapper">
+                    <canvas id="educationChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 3: Sexo -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">3. Qual o seu sexo?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 4: Definição de Light -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">4. O que caracteriza um alimento "Light"?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="lightDefChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 5: Definição de Diet -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">5. O que caracteriza um alimento "Diet"?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="dietDefChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 6: Adequado para Diabetes -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">6. Qual o mais adequado para diabéticos?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="diabetesChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 7: Diferença Diet vs Light -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">7. Qual a diferença entre "Diet" e "Light"?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="diffChart"></canvas>
+                </div>
+            </div>
+            <!-- Gráfico 8: Leitura de Rótulo -->
+            <div class="chart-card w-full opacity-0 translate-y-8 transition-all duration-700">
+                <h3 class="text-lg font-semibold text-center mb-4">8. Você costuma ler o rótulo nutricional?</h3>
+                <div class="chart-wrapper">
+                    <canvas id="labelChart"></canvas>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; 2025 Painel Interativo de Dados</p>
+        </footer>
+    </div>
+
+    <!-- Modal para exibir resultados da IA -->
+    <div id="aiModal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div class="modal-content bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl p-6 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
+                <h3 id="modalTitle" class="text-2xl font-semibold text-white">Resumo Analítico</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            </div>
+            <div id="modalBody" class="text-gray-300 max-h-[70vh] overflow-y-auto pr-2">
+                <!-- Spinner de Carregamento -->
+                <div id="loadingSpinner" class="flex flex-col justify-center items-center h-64">
+                    <div class="spinner w-12 h-12 rounded-full border-4 border-gray-600"></div>
+                    <p class="mt-4 text-lg text-gray-400">A analisar os dados... Por favor, aguarde.</p>
+                </div>
+                <!-- Conteúdo da Resposta -->
+                <div id="modalContent" class="whitespace-pre-wrap leading-relaxed"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DADOS DA PESQUISA ---
+        const surveyData = {
+            age: { title: "Faixa Etária", labels: ['18-22 anos', '21-35 anos', '> 40 anos'], data: [33.3, 37.5, 29.2] },
+            education: { title: "Escolaridade", labels: ['Ensino Médio Completo', 'Superior Completo', 'Superior Incompleto', 'Ensino Médio Incompleto'], data: [62.5, 12.5, 20.8, 4.2] },
+            gender: { title: "Sexo", labels: ['Feminino', 'Masculino'], data: [70.8, 29.2] },
+            lightDef: { title: "Definição de Light", labels: ['Redução de ingredientes', 'Eliminação de ingrediente', 'Alimento mais saudável'], data: [50, 12.5, 37.5] },
+            dietDef: { title: "Definição de Diet", labels: ['Eliminação de ingrediente', 'Alimentos orgânicos', 'Sem adição de Açúcar'], data: [16.7, 8.3, 75] },
+            diabetes: { title: "Adequado para Diabéticos", labels: ['Produto Diet', 'Ambos', 'Nenhum'], data: [54.2, 41.7, 4.2] },
+            difference: { title: "Diferença Diet vs Light", labels: ['Diet=Exclusão, Light=Redução', 'Diet para emagrecer', 'São a mesma coisa'], data: [79.2, 12.5, 8.3] },
+            readLabel: { title: "Hábito de Ler Rótulos", labels: ['Sempre', 'Raramente', 'Às vezes', 'Nunca'], data: [4.2, 25, 29.2, 41.7] }
+        };
+
+        // Paleta de cores
+        const colorPalettes = {
+            palette1: ['#38bdf8', '#fb7185', '#a78bfa', '#facc15', '#4ade80', '#f472b6'],
+            palette2: ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1'],
+            palette3: ['#22d3ee', '#34d399', '#a3e635', '#fde047', '#fb923c', '#f87171']
+        };
+
+        // --- LÓGICA DA API GEMINI ---
+        const callGeminiAPI = async (prompt) => {
+            const apiKey = "AIzaSyDRkLNcpu1OEGp5gTrepnRoN3PVWCmgcvo";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
+                const result = await response.json();
+                return result.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error("Falha ao chamar a API do Gemini:", error);
+                return `Ocorreu um erro ao gerar a análise. Por favor, tente novamente.\nDetalhes: ${error.message}`;
+            }
+        };
+        
+        // --- LÓGICA DO MODAL ---
+        const modal = document.getElementById('aiModal');
+        const modalContentEl = document.getElementById('modalContent');
+        const modalEl = document.querySelector('.modal-content');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        const openModal = () => {
+            modalContentEl.innerHTML = '';
+            loadingSpinner.style.display = 'flex';
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => modalEl.classList.remove('scale-95', 'opacity-0'), 10);
+        };
+
+        const closeModal = () => {
+            modalEl.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300);
+        };
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => e.target === modal && closeModal());
+
+        // --- LÓGICA DO BOTÃO DE ANÁLISE ---
+        document.getElementById('geminiAnalyzeBtn').addEventListener('click', async () => {
+            openModal();
+            
+            let dataSummary = "";
+            for (const key in surveyData) {
+                const item = surveyData[key];
+                const dataString = item.labels.map((label, i) => `${label}: ${item.data[i]}%`).join(', ');
+                dataSummary += `\n- **${item.title}:** ${dataString}`;
+            }
+
+            const prompt = `
+Aja como um analista de pesquisa de mercado. Recebeu os seguintes dados de uma pesquisa sobre a percepção dos consumidores sobre produtos 'Diet' e 'Light'.
+
+**Dados da Pesquisa:**
+${dataSummary}
+
+Com base nestes dados, por favor, gere um resumo analítico em Português (Portugal). O resumo deve ser bem estruturado e de fácil leitura. Inclua o seguinte:
+
+1.  **Perfil do Respondente:** Descreva o público principal com base nos dados demográficos (idade, escolaridade, sexo).
+2.  **Principais Conclusões:** Identifique os 3 a 4 insights mais importantes e surpreendentes da pesquisa. Por exemplo, a confusão entre os termos, o perfil de quem não lê rótulos, a forte associação de 'Diet' com açúcar.
+3.  **Recomendações de Marketing:** Com base nas conclusões, sugira duas estratégias concretas que uma marca de alimentos saudáveis poderia adotar para educar ou alcançar este público.
+
+Formate a resposta com títulos a negrito para cada secção (ex: **Perfil do Respondente**). Use listas com marcadores para os insights e recomendações.
+`;
+
+            const analysis = await callGeminiAPI(prompt);
+            loadingSpinner.style.display = 'none';
+            modalContentEl.innerHTML = analysis.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white text-lg block mt-4 mb-2">$1</strong>');
+        });
+
+        // --- FUNÇÃO PARA CRIAR GRÁFICOS ---
+        function createDoughnutChart(canvasId, chartData, palette) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{ data: chartData.data, backgroundColor: palette, borderColor: 'rgba(31, 41, 55, 0.7)', borderWidth: 3, hoverOffset: 15 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '60%',
+                    plugins: {
+                        tooltip: {
+                            callbacks: { label: (c) => `${c.label || ''}: ${c.parsed.toFixed(1)}%` },
+                            backgroundColor: '#111827', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8, displayColors: false
+                        }
+                    },
+                    animation: { animateScale: true, animateRotate: true }
+                }
+            });
+        }
+
+        // --- INICIALIZAÇÃO DOS GRÁFICOS E ANIMAÇÃO DOS CARDS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            createDoughnutChart('ageChart', surveyData.age, colorPalettes.palette1);
+            createDoughnutChart('educationChart', surveyData.education, colorPalettes.palette2);
+            createDoughnutChart('genderChart', surveyData.gender, colorPalettes.palette3.slice(0, 2));
+            createDoughnutChart('lightDefChart', surveyData.lightDef, colorPalettes.palette1);
+            createDoughnutChart('dietDefChart', surveyData.dietDef, colorPalettes.palette2);
+            createDoughnutChart('diabetesChart', surveyData.diabetes, colorPalettes.palette3);
+            createDoughnutChart('diffChart', surveyData.difference, colorPalettes.palette1);
+            createDoughnutChart('labelChart', surveyData.readLabel, colorPalettes.palette2);
+
+            // Animação dos cards em cascata
+            document.querySelectorAll('.chart-card').forEach((el, i) => {
+                setTimeout(() => {
+                    el.classList.remove('opacity-0', 'translate-y-8');
+                }, 150 * i);
+            });
+        });
+
+        // --- DOWNLOAD DOS GRÁFICOS EM PDF ---
+        document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const charts = document.querySelectorAll('.chart-card');
+            let y = 10;
+
+            for (let i = 0; i < charts.length; i++) {
+                const canvas = await html2canvas(charts[i]);
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = 180;
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                if (y + pdfHeight > 287) {
+                    pdf.addPage();
+                    y = 10;
+                }
+                pdf.addImage(imgData, 'PNG', 15, y, pdfWidth, pdfHeight);
+                y += pdfHeight + 10;
+            }
+
+            pdf.save('graficos-pesquisa.pdf');
+        });
+    </script>
+</body>
+</html>
