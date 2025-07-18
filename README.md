@@ -63,9 +63,6 @@ O objetivo foi criar uma ferramenta de visualização de dados moderna, responsi
 
 ---
 
-## 👨‍💻 Autores
+## 👨‍💻 Autor
 
--   Tarciso Ferreira
--   Maria Dayane
--   Alana Silvestre
-
+Feito por **Tarciso Ferreira**.
