@@ -36,33 +36,6 @@ O objetivo foi criar uma ferramenta de visualização de dados moderna, responsi
 
 ---
 
-## ⚙️ Como Executar e Configurar
-
-### Pré-requisitos
-
--   Um navegador web moderno (Chrome, Firefox, Edge, etc.).
--   Uma chave de API do Google Gemini (você pode obter uma no [Google AI Studio](https://aistudio.google.com/)).
-
-### Rodando a Aplicação
-
-1.  **Clone o repositório:**
-    ```bash
-    git clone <URL_DO_SEU_REPOSITORIO>
-    ```
-
-2.  **Configure sua Chave de API:**
-    -   Abra o arquivo `index.html` em um editor de código.
-    -   Procure pela linha `const apiKey = "AIzaSy...";` dentro da tag `<script>`.
-    -   **Substitua o valor existente pela sua própria chave de API do Google Gemini.**
-
-    > **⚠️ Aviso de Segurança Importante:**
-    > Expor sua chave de API diretamente no código do front-end é uma prática insegura e deve ser usada apenas para testes locais ou projetos de demonstração. Em uma aplicação real, a chave deve ser protegida em um servidor de back-end.
-
-3.  **Visualize a Página:**
-    Após salvar a alteração com sua chave, simplesmente dê um duplo clique no arquivo `index.html` para abri-lo no seu navegador. Para uma melhor experiência, use a extensão "Live Server" no VS Code.
-
----
-
 ## 👨‍💻 Autor
 
 Feito por **Tarciso Ferreira**.
